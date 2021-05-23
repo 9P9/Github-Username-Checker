@@ -5,10 +5,8 @@ const prompt = require('prompt');
 const fs = require('fs');
 const proxies = fs.readFileSync('proxies.txt', 'utf-8').replace(/\r/gi, '').split('\n');
 const usernames = [...new Set(require('fs').readFileSync('usernames.txt', 'utf-8').replace(/\r/g, '').split('\n'))];
-
 const ProxyAgent = require('proxy-agent');
-
-
+const config = require("./config.json");
 
 process.on('uncaughtException', e => {});
 process.on('uncaughtRejection', e => {});
@@ -24,9 +22,9 @@ function write(content, file) {
     });
 }
 
-function pcheck(username,type) {
+async function pcheck(username) {
     var proxy = proxies[Math.floor(Math.random() * proxies.length)];
-	var agent = new ProxyAgent(`${type}://` + proxy);
+	var agent = new ProxyAgent(`${config.proxyType}://${proxy}`);
     request({
         method: "GET",
         url: `https://github.com/${username}`,
@@ -40,6 +38,7 @@ function pcheck(username,type) {
 		}
 		else if (res && res.statusCode === 404) {
 			available++;
+		
 			console.log(chalk.green(`[%s] (%s/%s/%s) [Available] Username: %s | Proxy: %s`), res.statusCode, available, checked, usernames.length, username, proxy);
 			write(username + "\n", "usernames/available.txt");
 
@@ -58,7 +57,6 @@ function pcheck(username,type) {
 }
 
 function check(username) {
-    var proxy = proxies[Math.floor(Math.random() * proxies.length)];
     request({
         method: "GET",
         url: `https://github.com/${username}`,
@@ -114,33 +112,11 @@ prompt.start();
 	prompt.get(['options'], function(err, result) {
 	console.log('');
 	var options = result.options;
-		switch(options) {
-		case "1":
-			console.log(chalk.inverse("[INFO] Press Corrosponding Number to Select Proxy Type! ")); 
-			console.log(`[1] https
-[2] socks4
-[3] socks5`); 
-			prompt.get(['type'], function(err, result) {
-			console.log('');
-			var type = result.type;
-			switch(type) {
-				case "1": 
-					var type = "https";
-					break
-				case "2":
-					var type = "socks4";
-					break
-				case "3":
-					var type = "socks5";
-					break
-				default:
-					var type = "https";
-					break
-			}
+		switch(options){
+			case "1": 
 			console.log(`[Github Username Checker]: Started!`.inverse);
 			console.log(`[Checking %s Usernames with %s Proxies!]`.inverse, usernames.length, proxies.length);
-			for (var i in usernames) pcheck(usernames[i],type);
-			})
+			for (var i in usernames) pcheck(usernames[i]);
 			break;
 			
 		case "2":
