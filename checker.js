@@ -104,9 +104,9 @@ function printAsciiLogo() {
 }
 printAsciiLogo();
 process.title = `[313][Github Usernames Checker] Created By Luci`;
-console.log(chalk.red("[WARN] Some Usernames could be banned! ".inverse));
-console.log("[1] Proxied Checking ".inverse);
-console.log("[2] Proxyless Checker (Proxies)".inverse);
+console.log(chalk.hex("FF0000")(`[!] Some Usernames could be banned! `));
+console.log("[1] Proxied Checking ");
+console.log("[2] Proxyless Checker (Proxies)");
 prompt.start();	
 	console.log(""); 
 	prompt.get(['options'], function(err, result) {
